@@ -8,7 +8,7 @@ import PickersToolbar from '@material-ui/lab/internal/pickers/PickersToolbar';
 // eslint-disable-next-line no-restricted-imports
 import { ToolbarComponentProps } from '@material-ui/lab/internal/pickers/typings/BasePicker';
 
-function ToolbarComponent(props: ToolbarComponentProps<Date>) {
+function ToolbarComponent(props: ToolbarComponentProps<Date | null>) {
   return (
     <PickersToolbar
       toolbarTitle=""
