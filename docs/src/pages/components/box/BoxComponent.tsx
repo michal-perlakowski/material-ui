@@ -1,11 +1,15 @@
 import * as React from 'react';
-import Box from '@material-ui/core/Box';
-import Button from '@material-ui/core/Button';
+import useResizeObserver from '../../../../../packages/material-ui-utils/src/useResizeObserver';
 
 export default function BoxComponent() {
+  const [ready, setReady] = React.useState(false);
+  const [rect, ref] = useResizeObserver<HTMLPreElement>();
+  if (!ready) {
+    return <button type="button" onClick={() => setReady(true)}>Start</button>;
+  }
   return (
-    <Box component="span" sx={{ p: 2, border: '1px dashed grey' }}>
-      <Button>Save</Button>
-    </Box>
+    <pre ref={ref} style={{ width: '100%'  }}>
+      {JSON.stringify(rect, null, 2)}
+    </pre>
   );
 }
