@@ -1,21 +1,12 @@
 import * as React from 'react';
-import { ServerStyleSheets } from '@material-ui/styles';
-import { createTheme } from '@material-ui/core/styles';
+import { ServerStyleSheets } from '@mui/styles';
 import { ServerStyleSheet } from 'styled-components';
 import createEmotionServer from '@emotion/server/create-instance';
-import { CacheProvider } from '@emotion/react';
 import Document, { Html, Head, Main, NextScript } from 'next/document';
 import { LANGUAGES_SSR } from 'docs/src/modules/constants';
 import { pathnameToLanguage } from 'docs/src/modules/utils/helpers';
-import createCache from '@emotion/cache';
-
-function getCache() {
-  const cache = createCache({ key: 'css', prepend: true });
-  cache.compat = true;
-  return cache;
-}
-
-const defaultTheme = createTheme();
+import createEmotionCache from 'docs/src/createEmotionCache';
+import { getMetaThemeColor } from 'docs/src/modules/brandingTheme';
 
 // You can find a benchmark of the available CSS minifiers under
 // https://github.com/GoalSmashers/css-minification-benchmark
@@ -52,7 +43,16 @@ export default class MyDocument extends Document {
           */}
           <link rel="manifest" href="/static/manifest.json" />
           {/* PWA primary color */}
-          <meta name="theme-color" content={defaultTheme.palette.primary.main} />
+          <meta
+            name="theme-color"
+            content={getMetaThemeColor('light')}
+            media="(prefers-color-scheme: light)"
+          />
+          <meta
+            name="theme-color"
+            content={getMetaThemeColor('dark')}
+            media="(prefers-color-scheme: dark)"
+          />
           <link rel="shortcut icon" href="/static/favicon.ico" />
           {/* iOS Icon */}
           <link rel="apple-touch-icon" sizes="180x180" href="/static/icons/180x180.png" />
@@ -80,6 +80,33 @@ export default class MyDocument extends Document {
             This includes DNS lookups, TLS negotiations, TCP handshakes.
           */}
           <link href="https://fonts.gstatic.com" rel="preconnect" crossOrigin="anonymous" />
+          <link rel="preconnect" href="https://fonts.googleapis.com" />
+          <link
+            href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;700&family=Roboto:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap"
+            rel="stylesheet"
+          />
+          <link // prevent font flash
+            rel="preload"
+            // optimized for english characters (40kb -> 6kb)
+            href="/static/fonts/PlusJakartaSans-ExtraBold-subset.woff2"
+            as="font"
+            type="font/woff2"
+            crossOrigin="anonymous"
+          />
+          <style
+            // the above <link> does not work in mobile device, this inline <style> fixes it without blocking resources
+            // eslint-disable-next-line react/no-danger
+            dangerouslySetInnerHTML={{
+              __html: `@font-face{font-family:'PlusJakartaSans-ExtraBold';font-style:normal;font-weight:800;font-display:swap;src:url('/static/fonts/PlusJakartaSans-ExtraBold-subset.woff2') format('woff2');}`,
+            }}
+          />
+          <style
+            // the above <link> does not work in mobile device, this inline <style> fixes it without blocking resources
+            // eslint-disable-next-line react/no-danger
+            dangerouslySetInnerHTML={{
+              __html: `@font-face{font-family:'PlusJakartaSans-Bold';font-style:normal;font-weight:700;font-display:swap;src:url('/static/fonts/PlusJakartaSans-Bold-subset.woff2') format('woff2');}`,
+            }}
+          />
         </Head>
         <body>
           <Main />
@@ -129,20 +156,15 @@ MyDocument.getInitialProps = async (ctx) => {
   const styledComponentsSheet = new ServerStyleSheet();
   const originalRenderPage = ctx.renderPage;
 
-  const cache = getCache();
+  const cache = createEmotionCache();
   const { extractCriticalToChunks } = createEmotionServer(cache);
 
   try {
     ctx.renderPage = () =>
       originalRenderPage({
         enhanceApp: (App) => (props) =>
-          styledComponentsSheet.collectStyles(materialSheets.collect(<App {...props} />)),
-        // Take precedence over the CacheProvider in our custom _app.js
-        enhanceComponent: (Component) => (props) =>
-          (
-            <CacheProvider value={cache}>
-              <Component {...props} />
-            </CacheProvider>
+          styledComponentsSheet.collectStyles(
+            materialSheets.collect(<App emotionCache={cache} {...props} />),
           ),
       });
 

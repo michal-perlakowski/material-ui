@@ -2,7 +2,7 @@
 
 <p class="description">The `sx` prop is a shortcut for defining custom style that has access to the theme.</p>
 
-The property is a superset of CSS that packages [all the style functions](/system/basics/#all-inclusive) that are exposed in `@material-ui/system`.
+The property is a superset of CSS that packages [all the style functions](/system/basics/#all-inclusive) that are exposed in `@mui/system`.
 You can specify any valid CSS using this prop.
 
 ## Example
@@ -17,7 +17,8 @@ In the following sections, you will learn how different `sx` properties are mapp
 
 ### Borders
 
-The `border` property can receive only a number as a value and and it will create a solid black border using the number as the width.
+The `border` property can receive only a number as a value.
+It creates a solid black border using the number as the width.
 
 ```jsx
 <Box sx={{ border: 1 }} />
@@ -153,14 +154,14 @@ _Head to the [spacing page](/system/spacing/) for more details._
 
 ### Typography
 
-The `fontFamily`, `fontSize`, `fontStyle`, `fontWeight` properties map their value to the `theme.typgraphy` value.
+The `fontFamily`, `fontSize`, `fontStyle`, `fontWeight` properties map their value to the `theme.typography` value.
 
 ```jsx
 <Box sx={{ fontWeight: 'fontWeightLight' }} />
 // equivalent to fontWeight: theme.typography.fontWeightLight
 ```
 
-The same can be achieved by ommiting the CSS property prefix `fontWeight`.
+The same can be achieved by omitting the CSS property prefix `fontWeight`.
 
 ```jsx
 <Box sx={{ fontWeight: 'light' }} />
@@ -186,6 +187,45 @@ Each property in the `sx` prop can receive a function callback as a value. This 
 
 ```jsx
 <Box sx={{ height: (theme) => theme.spacing(10) }} />
+```
+
+## TypeScript usage
+
+A frequent source of confusion with the `sx` prop is TypeScript's [type widening](https://mariusschulz.com/blog/typescript-2-1-literal-type-widening), which causes this example not to work as expected:
+
+```ts
+const style = {
+  flexDirection: 'column',
+};
+
+export default function App() {
+  return <Button sx={style}>Example</Button>;
+}
+//    Type '{ flexDirection: string; }' is not assignable to type 'SxProps<Theme> | undefined'.
+//    Type '{ flexDirection: string; }' is not assignable to type 'CSSSelectorObject<Theme>'.
+//      Property 'flexDirection' is incompatible with index signature.
+//        Type 'string' is not assignable to type 'SystemStyleObject<Theme>'.
+```
+
+The problem is that the type of the `flexDirection` prop is inferred as `string`, which is too wide.
+To fix this, you can cast the object/function passed to the `sx` prop to const:
+
+```ts
+const style = {
+  flexDirection: 'column',
+} as const;
+
+export default function App() {
+  return <Button sx={style}>Example</Button>;
+}
+```
+
+Alternatively, you can pass the style object directly to the `sx` prop:
+
+```ts
+export default function App() {
+  return <Button sx={{ flexDirection: 'column' }}>Example</Button>;
+}
 ```
 
 ## Performance

@@ -1,7 +1,7 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/styles';
-import { createTheme } from '@material-ui/core/styles';
+import { withStyles } from '@mui/styles';
+import { createTheme } from '@mui/material/styles';
 import Head from 'docs/src/modules/components/Head';
 import AppFrame from 'docs/src/modules/components/AppFrame';
 import AppContainer from 'docs/src/modules/components/AppContainer';
@@ -29,7 +29,7 @@ function TopLayoutCompany(props) {
 
   return (
     <AppFrame disableDrawer>
-      <Head title={`${title} - Material-UI`} description={description} />
+      <Head title={`${title} - MUI`} description={description} />
       <div className={classes.root}>
         <AppContainer component="main" className={classes.container}>
           {rendered.map((chunk, index) => {

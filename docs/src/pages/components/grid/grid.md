@@ -12,7 +12,7 @@ materialDesign: https://material.io/design/layout/understanding-layout.html
 The [grid](https://material.io/design/layout/responsive-layout-grid.html) creates visual consistency between layouts while allowing flexibility across a wide variety of designs.
 Material Design's responsive UI is based on a 12-column grid layout.
 
-{{"component": "modules/components/ComponentLinkHeader.js"}}
+{{"component": "modules/components/ComponentLinkHeader.js", "design": false}}
 
 > ⚠️ The `Grid` component shouldn't be confused with a data grid; it is closer to a layout grid. For a data grid head to [the `DataGrid` component](/components/data-grid/).
 
@@ -101,6 +101,13 @@ The Auto-layout makes the _items_ equitably share the available space.
 That also means you can set the width of one _item_ and the others will automatically resize around it.
 
 {{"demo": "pages/components/grid/AutoGrid.js", "bg": true}}
+
+### Variable width content
+
+Set one of the size breakpoint props to `"auto"` instead of `true` / a `number` to size
+a column based on the natural width of its content.
+
+{{"demo": "pages/components/grid/VariableWidthGrid.js", "bg": true}}
 
 ## Complex Grid
 
